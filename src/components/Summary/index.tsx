@@ -8,20 +8,12 @@ import { TransactionsContext } from '../../TransactionsContext';
 import { Container } from "./styles";
 
 export function Summary() {
-  const transactions = useContext(TransactionsContext);
+  const { transactions } = useContext(TransactionsContext);
 
   console.log(transactions);
 
   return (
     <Container>
-      {/* <TransactionsContext.Consumer>
-        {(data) => {
-          console.log(data);
-
-          return <p>ok</p>
-        }}
-      </TransactionsContext.Consumer> forma antiga para consumir os dados do contexto*/}
-
       <div>
         <header>
           <p>Entradas</p>

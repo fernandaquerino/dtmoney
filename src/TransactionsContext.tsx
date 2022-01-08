@@ -11,11 +11,22 @@ interface Transaction {
   createdAt: string;
 }
 
+type TransactionInput = Omit<Transaction, 'id' | 'createdAt'>; //para pegar todas menos as informaçoes passadas
+
+// type TransactionInput = Pick<Transaction, 'title' | 'amount' | 'type' | 'category'>; //para pegar somente as informaçoes que quer
+
 interface TransactionsProviderProps {
   children: ReactNode
 }
 
-export const TransactionsContext = createContext<Transaction[]>([]);
+interface TransactionsContextData {
+  transactions: Transaction[]; 
+  createTransaction: (transaction: TransactionInput) => Promise<void>;
+}
+
+export const TransactionsContext = createContext<TransactionsContextData>(
+  {} as TransactionsContextData
+);
 
 export function TransactionsProvider({ children }: TransactionsProviderProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -25,8 +36,22 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
       .then(response => setTransactions(response.data.transactions))
   }, []);
 
+  async function createTransaction(transactionInput: TransactionInput) {
+    const response = await api.post('/transactions', {
+      ...transactionInput,
+      createdAt: new Date(),
+    });
+
+    const { transaction } = response.data;
+
+    setTransactions([
+      ...transactions,
+      transaction
+    ])
+  }
+
   return (
-    <TransactionsContext.Provider value={transactions}>
+    <TransactionsContext.Provider value={{ transactions, createTransaction }}>
       {children}
     </TransactionsContext.Provider>
   )
